@@ -70,7 +70,7 @@ export default function App() {
     const val = localStorage.getItem('i34bo_crt');
     return val !== null ? val === 'true' : true;
   });
-  const solanaAddress = 'COMING SOON';
+  const solanaAddress = 'JDz13Z62UnszaSgSaH5f1nuVhm8Zb4LUaXh3fueEpump';
 
   // Persist to localStorage whenever balance changes
   useEffect(() => { localStorage.setItem('i34bo_void', String(voidBalance)); }, [voidBalance]);
