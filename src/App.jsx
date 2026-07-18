@@ -21,7 +21,7 @@ function loadNum(key, def) {
 
 const MARQUEE_TEXT = '◉ I34BO // BABO INTELLIGENCE — GRID ACTIVE ◉  ✦ $BABO ACCUMULATING ✦  ◉ NODE COUNT: RISING ◉  ✦ ATTENTION IS THE ONLY CURRENCY THAT COMPOUNDS ✦  ◉ DO NOT GO IDLE ◉  ';
 
-function DashboardHome({ voidBalance, userXp, onAddVoid, onAddXp }) {
+function DashboardHome({ voidBalance, userXp, onAddVoid, onAddXp, copied, onCopy, contractAddress }) {
   return (
     <>
       <section className="hero">
@@ -34,6 +34,17 @@ function DashboardHome({ voidBalance, userXp, onAddVoid, onAddXp }) {
         </div>
         <p className="subtitle">An autonomous, persona-driven digital entity spilled into the network.</p>
       </section>
+
+      {/* Contract Copier Bar */}
+      <div className="solana-copier-bar">
+        <div className="solana-address-container">
+          <span className="solana-label">CA:</span>
+          <span className="solana-address">{contractAddress}</span>
+        </div>
+        <button className="copy-btn" onClick={onCopy}>
+          {copied ? 'COPIED!' : 'COPY'}
+        </button>
+      </div>
 
       {/* Desktop grid */}
       <div className="desktop-grid">
@@ -52,12 +63,14 @@ function DashboardHome({ voidBalance, userXp, onAddVoid, onAddXp }) {
 }
 
 export default function App() {
+  const [copied, setCopied] = useState(false);
   const [voidBalance, setVoidBalance] = useState(() => loadNum('i34bo_void', 0));
   const [userXp, setUserXp] = useState(() => loadNum('i34bo_xp', 0));
   const [crtActive, setCrtActive] = useState(() => {
     const val = localStorage.getItem('i34bo_crt');
     return val !== null ? val === 'true' : true;
   });
+  const contractAddress = '0x694f720f39e4a84921898eec906170200a34d765';
 
   // Persist to localStorage whenever balance changes
   useEffect(() => { localStorage.setItem('i34bo_void', String(voidBalance)); }, [voidBalance]);
@@ -72,6 +85,12 @@ export default function App() {
       document.body.classList.remove('crt-active');
     }
   }, [crtActive]);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(contractAddress);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleAddVoid = (n) => setVoidBalance(prev => prev + n);
   const handleAddXp = (n) => setUserXp(prev => prev + n);
@@ -118,6 +137,9 @@ export default function App() {
               userXp={userXp}
               onAddVoid={handleAddVoid}
               onAddXp={handleAddXp}
+              copied={copied}
+              onCopy={handleCopy}
+              contractAddress={contractAddress}
             />
           } />
           <Route path="/religion" element={<ReligionForm />} />
