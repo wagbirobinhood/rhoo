@@ -5,7 +5,7 @@ import { mainnet } from 'viem/chains';
 import './index.css';
 
 // --- TOKEN GATING CONFIGURATION ---
-const TOKEN_CONTRACT_ADDRESS = '0x483cf245a8d2e679c3fab49b0a6c3c39c63bc007';
+const TOKEN_CONTRACT_ADDRESS = 'COMING SOON';
 // MINIMUM BALANCE REQUIRED: 100,000 Tokens. 
 // Standard tokens have 18 decimals, so we multiply 100,000 by 10^18.
 const MIN_TOKEN_BALANCE = 100000n * 10n ** 18n; 
@@ -111,6 +111,10 @@ function Navbar({ currentTab, setCurrentTab }) {
 
 function Hero({ setPopupMessage }) {
   const copyCA = () => {
+    if (TOKEN_CONTRACT_ADDRESS === 'COMING SOON' || !TOKEN_CONTRACT_ADDRESS) {
+      setPopupMessage("SYS.INFO: Contract Address is coming soon!");
+      return;
+    }
     navigator.clipboard.writeText(TOKEN_CONTRACT_ADDRESS);
     setPopupMessage("SYS.SUCCESS: Contract Address copied to clipboard!");
   };
@@ -123,7 +127,7 @@ function Hero({ setPopupMessage }) {
       </p>
       
       <div className="hero-actions">
-        <div className="ca-box" onClick={copyCA} title="Click to copy CA" style={{ cursor: 'pointer' }}>
+        <div className="ca-box" onClick={copyCA} title="Contract Address Coming Soon" style={{ cursor: 'pointer' }}>
           <span className="ca-label">CA:</span>
           <span className="ca-address">{TOKEN_CONTRACT_ADDRESS}</span>
         </div>
@@ -434,12 +438,16 @@ function GachaGrid({ setPopupMessage }) {
     try {
       let balance = 0n;
       try {
-        balance = await publicClient.readContract({
-          address: TOKEN_CONTRACT_ADDRESS,
-          abi: erc20Abi,
-          functionName: 'balanceOf',
-          args: [activeWallet.address],
-        });
+        if (TOKEN_CONTRACT_ADDRESS && TOKEN_CONTRACT_ADDRESS.startsWith('0x')) {
+          balance = await publicClient.readContract({
+            address: TOKEN_CONTRACT_ADDRESS,
+            abi: erc20Abi,
+            functionName: 'balanceOf',
+            args: [activeWallet.address],
+          });
+        } else {
+          balance = MIN_TOKEN_BALANCE;
+        }
       } catch (readErr) {
         console.warn("Could not read contract balance, applying fallback:", readErr);
         // Fallback for testing/unsupported RPC
