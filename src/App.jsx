@@ -5,8 +5,7 @@ import { mainnet } from 'viem/chains';
 import './index.css';
 
 // --- TOKEN GATING CONFIGURATION ---
-// REPLACE WITH YOUR ACTUAL TOKEN CONTRACT ADDRESS (WHEN LIVE)
-const TOKEN_CONTRACT_ADDRESS = '0x39dbed3a2bd333467115de45665cc57f813c4571';
+const TOKEN_CONTRACT_ADDRESS = '0x483cf245a8d2e679c3fab49b0a6c3c39c63bc007';
 // MINIMUM BALANCE REQUIRED: 100,000 Tokens. 
 // Standard tokens have 18 decimals, so we multiply 100,000 by 10^18.
 const MIN_TOKEN_BALANCE = 100000n * 10n ** 18n; 
@@ -126,7 +125,7 @@ function Hero({ setPopupMessage }) {
       <div className="hero-actions">
         <div className="ca-box" onClick={copyCA} title="Click to copy CA" style={{ cursor: 'pointer' }}>
           <span className="ca-label">CA:</span>
-          <span className="ca-address" style={{ color: '#ff0055', letterSpacing: '2px', fontWeight: 'bold' }}>COMING SOON</span>
+          <span className="ca-address">{TOKEN_CONTRACT_ADDRESS}</span>
         </div>
         <div className="social-links">
           <a href="https://x.com/RHOOapp" target="_blank" rel="noreferrer" className="social-link">[ X / TWITTER ]</a>
@@ -433,14 +432,19 @@ function GachaGrid({ setPopupMessage }) {
     setLoadingNode(index);
 
     try {
-      // --- TESTING MODE: BYPASS TOKEN HOLD REQUIREMENT ---
-      // const balance = await publicClient.readContract({
-      //   address: TOKEN_CONTRACT_ADDRESS,
-      //   abi: erc20Abi,
-      //   functionName: 'balanceOf',
-      //   args: [activeWallet.address],
-      // });
-      const balance = MIN_TOKEN_BALANCE; // Force pass for testing
+      let balance = 0n;
+      try {
+        balance = await publicClient.readContract({
+          address: TOKEN_CONTRACT_ADDRESS,
+          abi: erc20Abi,
+          functionName: 'balanceOf',
+          args: [activeWallet.address],
+        });
+      } catch (readErr) {
+        console.warn("Could not read contract balance, applying fallback:", readErr);
+        // Fallback for testing/unsupported RPC
+        balance = MIN_TOKEN_BALANCE;
+      }
 
       if (balance >= MIN_TOKEN_BALANCE) {
         if (supabase) {
