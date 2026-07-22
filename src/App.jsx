@@ -102,11 +102,6 @@ function Navbar({ currentTab, setCurrentTab }) {
         )}
       </div>
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        {authenticated && (
-          <div className="balance-ui">
-            RHOO: 1,000,000.00
-          </div>
-        )}
         <button className={`btn-connect ${authenticated ? 'connected' : ''}`} onClick={handleWalletClick}>
           {getButtonText()}
         </button>
